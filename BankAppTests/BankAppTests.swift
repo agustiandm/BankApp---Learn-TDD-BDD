@@ -6,27 +6,48 @@
 //
 
 import XCTest
+@testable import BankApp
 
 class BankAppTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    private var account: Account!
+    
+    
+    //this func call BEFORE each test
+    override func setUp() {
+        super.setUp()
+        self.account = Account()
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    func test_initBalanceZero() {
+        XCTAssertTrue(self.account.balance == 0, "Balance is not zero")
     }
-
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    func test_DepositFunds() {
+        self.account.deposit(100)
+        XCTAssertEqual(100, self.account.balance)
     }
-
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        measure {
-            // Put the code you want to measure the time of here.
+    
+    func test_WithdrawFunds() {
+        
+        self.account.deposit(100)
+        try? self.account.withdraw(50)
+        
+        XCTAssertEqual(50, self.account.balance)
+    }
+    
+    func test_WithdrawFromInsufficientBalance() {
+        
+        self.account.deposit(100)
+        XCTAssertThrowsError(try self.account.withdraw(500)) { error in
+            XCTAssertEqual(error as! AccountError, AccountError.insufficientFunds)
         }
+    }
+    
+
+    //this func call AFTER each test
+    override class func tearDown() {
+        super.tearDown()
     }
 
 }
